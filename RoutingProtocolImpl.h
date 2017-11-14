@@ -48,6 +48,9 @@ class RoutingProtocolImpl : public RoutingProtocol {
     Node *sys; // To store Node object; used to access GSR9999 interfaces
     PortTable portTable;
     ForwardTable forwardTable;
+    unsigned short routerId;
+    eProtocolType protocolType;
+    void send_pkt_ping(unsigned short portID);
 };
 
 #endif

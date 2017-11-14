@@ -7,6 +7,7 @@
 
 
 #include "global.h"
+#define MAX_PORT_TTL 15
 
 struct Port {
     unsigned short port_id;
@@ -19,7 +20,9 @@ class PortTable {
 public:
     PortTable();
     void init(unsigned short port_num, unsigned short router_id);
-
+    unsigned short size();
+    void increaseTTL();
+    bool isChanged(queue<unsigned short> &expiredPorts);
 private:
     Port* ports;
     unsigned short portNum;
