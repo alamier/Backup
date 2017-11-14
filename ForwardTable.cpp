@@ -4,6 +4,8 @@
 
 #include "ForwardTable.h"
 
+ForwardTable::ForwardTable() {}
+
 void ForwardTable::init(unsigned short routerId, eProtocolType protocolType) {
   this->routerId = routerId;
   this->protocolType = protocolType;

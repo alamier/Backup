@@ -17,7 +17,7 @@ struct Port {
 
 class PortTable {
 public:
-    PortTable(){};
+    PortTable();
     void init(unsigned short port_num, unsigned short router_id);
 
 private:
