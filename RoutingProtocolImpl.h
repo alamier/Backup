@@ -51,6 +51,8 @@ class RoutingProtocolImpl : public RoutingProtocol {
     unsigned short routerId;
     eProtocolType protocolType;
     void send_pkt_ping(unsigned short portID);
+    void send_pkt_DV(unsigned short destID);
+    void send_pkt_LS(unsigned short portID);
 };
 
 #endif

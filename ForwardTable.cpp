@@ -108,3 +108,108 @@ bool ForwardTable::updateForwardTableAccordingToShortestPath(unsigned short* pat
   }
   return updated;
 }
+
+bool ForwardTable::updateForwardTableDV(unsigned short destID, unsigned short nextHop, unsigned short newCost,
+                                        unsigned short oldCost) {
+  bool changed = false;
+  std::unordered_map<unsigned short, vector<ForwardEntry> >::iterator it;
+  if(newCost == USHRT_MAX){
+    for(it =forwardTable.begin(); it!=forwardTable.end(); it++){
+      if((*it).second.empty())
+        continue;
+      if((*it).second.at(0).nextHop==destID){
+        forwardTable[(*it).first].clear();
+        forwardTable.erase((*it).first);
+        changed = true;
+      }
+    }
+    return changed;
+  }
+  if(forwardTable.find(destID) == forwardTable.end()){
+    //entry not found, insert entry
+    if(forwardTable[destID].empty())
+      forwardTable[destID].push_back(ForwardEntry());
+    forwardTable[destID].at(0).cost=newCost;
+    forwardTable[destID].at(0).destID=destID;
+    forwardTable[destID].at(0).TTL=0;
+    forwardTable[destID].at(0).nextHop=nextHop;
+    changed=true;
+  }
+  else if(forwardTable[destID].empty()){
+    forwardTable[destID].push_back(ForwardEntry());
+    forwardTable[destID].at(0).cost=newCost;
+    forwardTable[destID].at(0).destID=destID;
+    forwardTable[destID].at(0).TTL=0;
+    forwardTable[destID].at(0).nextHop=nextHop;
+    changed=true;
+  }
+  else if(forwardTable[destID].at(0).nextHop!=nextHop){
+    if(newCost<forwardTable[destID].at(0).cost){
+      //find a shorter path, change path
+      forwardTable[destID].at(0).cost=newCost;
+      forwardTable[destID].at(0).destID=destID;
+      forwardTable[destID].at(0).TTL=0;
+      forwardTable[destID].at(0).nextHop=nextHop;
+      changed=true;
+    }
+    else{
+      //current path is shorter, do nothing
+      //return false;
+    }
+  }
+  //refresh all entries whose via_hop == nextHop
+  for(it=forwardTable.begin(); it!=forwardTable.end(); it++){
+    if((*it).second.empty())
+      continue;
+    if((*it).second.at(0).nextHop==nextHop){ //&& {
+      //if((*it).second.at(0).destID!=nextHop)
+      (*it).second.at(0).cost=(*it).second.at(0).cost+newCost-oldCost;
+      (*it).second.at(0).TTL=0;
+      if(newCost!=oldCost)
+        changed=true;
+    }
+  }
+
+  return changed;
+}
+
+bool ForwardTable::updateForwardTableLS(unsigned short destID, unsigned short newCost) {
+  for(unsigned int i=0; i<forwardTable[routerId].size(); i++){
+    if(forwardTable[routerId].at(i).destID==destID){
+      if(newCost==USHRT_MAX){
+        forwardTable[routerId].erase(forwardTable[routerId].begin()+i);
+        return true;
+      }
+      if(forwardTable[routerId].at(i).cost!=newCost){
+        forwardTable[routerId].at(i).cost=newCost;
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
+  }
+  if(newCost!=USHRT_MAX){
+    forwardTable[routerId].push_back(ForwardEntry(destID,newCost,routerId,0));
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+int ForwardTable::size() {
+  return forwardTable.size();
+}
+
+unordered_map<unsigned short, vector<ForwardEntry>>ForwardTable::getForwardTable() {
+  return forwardTable;
+}
+
+unsigned int ForwardTable::getSeqNum() const {
+  return seqNum;
+}
+
+void ForwardTable::increaseSeqNum() {
+  this->seqNum ++;
+}

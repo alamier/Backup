@@ -23,6 +23,8 @@ public:
     unsigned short size();
     void increaseTTL();
     bool isChanged(queue<unsigned short> &expiredPorts);
+    bool port2Id(unsigned short port, unsigned short& Id);
+    bool Id2port(unsigned short Id, unsigned short& port);
 private:
     Port* ports;
     unsigned short portNum;

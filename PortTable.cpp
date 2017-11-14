@@ -34,3 +34,29 @@ bool PortTable::isChanged(queue<unsigned short> &expiredPorts) {
   }
   return changed;
 }
+
+bool PortTable::port2Id(unsigned short port, unsigned short &Id) {
+  if(port > portNum - 1) {
+    std::cout<<"Error: [port2Id()] port id exceeds max num"<<std::endl;
+    return false;
+  }
+  if(ports[port].TTL < 0) {
+    return false;
+  }
+  else{
+    Id = ports[port].router_id;
+    return true;
+  }
+}
+
+bool PortTable::Id2port(unsigned short Id, unsigned short &port) {
+  for(int i=0;i<portNum;i++){
+    if(ports[i].TTL<0)
+      continue;
+    if(ports[i].router_id==Id){
+      port=ports[i].port_id;
+      return true;
+    }
+  }
+  return false;
+}
