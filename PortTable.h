@@ -25,6 +25,8 @@ public:
     bool isChanged(queue<unsigned short> &expiredPorts);
     bool port2Id(unsigned short port, unsigned short& Id);
     bool Id2port(unsigned short Id, unsigned short& port);
+    void refreshTTL(unsigned short port);
+    bool getCostByPort(unsigned short port, unsigned int &cost);
 private:
     Port* ports;
     unsigned short portNum;

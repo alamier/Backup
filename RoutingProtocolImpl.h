@@ -53,6 +53,7 @@ class RoutingProtocolImpl : public RoutingProtocol {
     void send_pkt_ping(unsigned short portID);
     void send_pkt_DV(unsigned short destID);
     void send_pkt_LS(unsigned short portID);
+    void* make_pkt_pong(unsigned short port, void *ping_packet);
 };
 
 #endif

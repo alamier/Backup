@@ -8,6 +8,10 @@ PortTable::PortTable() {}
 
 void PortTable::init(unsigned short port_num, unsigned short router_id) {
   this->portNum = port_num;
+  this->ports = (Port*)malloc(sizeof(Port) * port_num);
+  for(int i = 0; i < port_num; i++){
+    ports[i].TTL = -1;
+  }
   this->routerId = router_id;
 }
 
@@ -59,4 +63,23 @@ bool PortTable::Id2port(unsigned short Id, unsigned short &port) {
     }
   }
   return false;
+}
+
+void PortTable::refreshTTL(unsigned short port) {
+  if(port>portNum-1){
+    std::cout<<"Error [refreshTTL(unsigned short port)]"<<std::endl;
+    return;
+  }
+  if(ports[port].TTL<0){
+    return;
+  }
+  else{
+    ports[port].TTL=0;
+  }
+}
+
+bool PortTable::getCostByPort(unsigned short port, unsigned int &cost) {
+  if(ports[port].TTL<0) return false;
+  cost=ports[port].rtt;
+  return true;
 }

@@ -95,6 +95,20 @@ void RoutingProtocolImpl::handle_alarm(void *data) {
 
     case ALARM_DV:
     case ALARM_LS:{
+      sys->set_alarm(this, 30 * 1000, data);
+      if(protocolType == P_DV){
+        unsigned short Id;
+        for(int i = 0; i < portTable.size(); i++){
+          if(!portTable.port2Id(i, Id)) continue;
+          send_pkt_DV(Id);
+        }
+      }else{
+        unsigned short Id;
+        for(int i = 0; i < portTable.size(); i++){
+          if(!portTable.port2Id(i, Id)) continue;
+          send_pkt_DV(Id);
+        }
+      }
       break;
     }
   }
@@ -102,6 +116,35 @@ void RoutingProtocolImpl::handle_alarm(void *data) {
 
 void RoutingProtocolImpl::recv(unsigned short port, void *packet, unsigned short size) {
   // add your own code
+  unsigned short packet_type = *((unsigned char *)packet);
+  switch (packet_type) {
+    case 1:{
+      //PING packet
+      char* pong_pkt =(char*)make_pkt_pong(port, packet);
+      sys->send(port, pong_pkt, size);
+      break;
+    }
+    case 2:{
+
+      break;
+    }
+    case 3:{
+      // DV packet
+      unsigned int newCost;
+      if(portTable.getCostByPort(port, newCost)){
+      //TODO
+      }
+      break;
+    }
+    case 4:{
+
+      break;
+    }
+    case 0:{
+
+      break;
+    }
+  }
 }
 
 void RoutingProtocolImpl::send_pkt_ping(unsigned short portID) {
@@ -168,6 +211,16 @@ void RoutingProtocolImpl::send_pkt_LS(unsigned short portID) {
   }
 
   sys->send(portID, packet, packet_size);
+}
+
+void *RoutingProtocolImpl::make_pkt_pong(unsigned short port, void *ping_packet) {
+  *((unsigned char*)ping_packet)=(char)2;      //{"DATA","PING","PONG","DV","LS"};
+  unsigned short dest=(unsigned short) ntohs(*((unsigned short*)ping_packet+2));
+  *((unsigned short *)ping_packet+3)=(unsigned short) htons((unsigned short)dest);
+  *((unsigned short *)ping_packet+2)=(unsigned short) htons((unsigned short)routerId);
+  portTable.refreshTTL(port);
+
+  return ping_packet;
 }
 
 // add more of your own code
